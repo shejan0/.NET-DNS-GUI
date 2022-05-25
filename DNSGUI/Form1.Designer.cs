@@ -34,6 +34,8 @@ namespace DNSGUI
             this.PingLabel = new System.Windows.Forms.Label();
             this.InformationLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.resultImage = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.resultImage)).BeginInit();
             this.SuspendLayout();
             // 
             // AddressInput
@@ -52,14 +54,14 @@ namespace DNSGUI
             this.IPAddressOutput.ItemHeight = 16;
             this.IPAddressOutput.Location = new System.Drawing.Point(12, 75);
             this.IPAddressOutput.Name = "IPAddressOutput";
-            this.IPAddressOutput.Size = new System.Drawing.Size(470, 228);
+            this.IPAddressOutput.Size = new System.Drawing.Size(470, 100);
             this.IPAddressOutput.TabIndex = 1;
             this.IPAddressOutput.SelectedIndexChanged += new System.EventHandler(this.IPAddressOutput_SelectedIndexChanged);
             // 
             // PingLabel
             // 
             this.PingLabel.AutoSize = true;
-            this.PingLabel.Location = new System.Drawing.Point(13, 418);
+            this.PingLabel.Location = new System.Drawing.Point(24, 429);
             this.PingLabel.Name = "PingLabel";
             this.PingLabel.Size = new System.Drawing.Size(0, 17);
             this.PingLabel.TabIndex = 2;
@@ -68,7 +70,7 @@ namespace DNSGUI
             // InformationLabel
             // 
             this.InformationLabel.AutoSize = true;
-            this.InformationLabel.Location = new System.Drawing.Point(13, 347);
+            this.InformationLabel.Location = new System.Drawing.Point(24, 377);
             this.InformationLabel.MaximumSize = new System.Drawing.Size(470, 0);
             this.InformationLabel.Name = "InformationLabel";
             this.InformationLabel.Size = new System.Drawing.Size(0, 17);
@@ -84,11 +86,20 @@ namespace DNSGUI
             this.label1.Text = "Enter URL or IP (Hit Enter)";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // resultImage
+            // 
+            this.resultImage.Location = new System.Drawing.Point(12, 182);
+            this.resultImage.Name = "resultImage";
+            this.resultImage.Size = new System.Drawing.Size(470, 182);
+            this.resultImage.TabIndex = 5;
+            this.resultImage.TabStop = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(494, 465);
+            this.Controls.Add(this.resultImage);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.InformationLabel);
             this.Controls.Add(this.PingLabel);
@@ -97,6 +108,7 @@ namespace DNSGUI
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Form1";
             this.Text = "DNS GUI Program by Shejan Shuza";
+            ((System.ComponentModel.ISupportInitialize)(this.resultImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -111,6 +123,7 @@ namespace DNSGUI
         private System.Windows.Forms.Label PingLabel;
         private System.Windows.Forms.Label InformationLabel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.PictureBox resultImage;
     }
 }
 
