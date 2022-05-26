@@ -17,9 +17,10 @@ The keys in the JSON are: "mapBoxApiKey", "tomTomApiKey", and "bingMapsApiKey" a
 
 For example:
 ```
-
+{
     "mapBoxApiKey": "Mapboxdddfdddddddddddddddd",
     "tomTomApiKey": "OldTomTomGPS",
     "bingMapsApiKey": "GOOGLECOMPETITOR"
+}
 ```
 would be a valid JSON input.
