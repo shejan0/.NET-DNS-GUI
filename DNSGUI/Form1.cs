@@ -185,10 +185,14 @@ namespace DNSGUI
                             }
                             break;
                     }
-                    if (url!=null) //we really don't need to check if the image was successful, the caller as error handling and makes a graphics image if null is returned
+                    if (url!=null)
                     {
                         Console.WriteLine(url);
-                        return Image.FromStream(client.OpenRead(url));
+                        System.Drawing.Image im= Image.FromStream(client.OpenRead(url));
+                        if (im != null)
+                        {
+                            return im;
+                        }
                     }
                     else
                     {
