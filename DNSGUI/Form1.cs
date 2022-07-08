@@ -16,50 +16,53 @@ namespace DNSGUI
 {
     public partial class Form1 : Form
     {
-        ListBox.ObjectCollection output;
-        IPAddress selectedIP;
-        bool currentlypinging = false;
-        Ping pingObject = new Ping();
-        PingReply reply;
-        WebClient client = new WebClient();
-        Timer timer;
-        KEY_JSON keys; 
+        ListBox.ObjectCollection output; //ListBox Collection for GUI
+        IPAddress selectedIP; //the IP Address selected in interface
+        bool currentlypinging = false; //used to see current pinging status
+        Ping pingObject = new Ping(); //ping object
+        PingReply reply; //reply object for Ping, avoids memory leak
+        WebClient client = new WebClient(); //Web Client for map images
+        Timer timer; //timer object for timing Ping 
+        KEY_JSON keys; //keys.json
         public Form1(String[] args)
         {
             InitializeComponent();
-            output = IPAddressOutput.Items;
-            DNSSearch();
-            timer = new Timer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = 1;
-            String lines="";
-            if (args.Length > 1)
+            output = IPAddressOutput.Items; //get Items list from GUI
+            DNSSearch(); //run DNS Search to get the default results
+            timer = new Timer(); //Build a timer object, used to figure out how long ping takes
+            timer.Tick += Timer_Tick; //preset what the tick function does
+            timer.Interval = 1; //1 ms latency
+            String lines=""; //lines from file
+            try
             {
-                lines = File.ReadAllText(args[1]);
+                if (args.Length > 1)
+                {
+                    //If a command line argument is passed, use that file.
+                    lines = File.ReadAllText(args[1]);
+               
+                }
+                else
+                {
+                
+                    //default use "keys.json"
+                    lines = File.ReadAllText("keys.json");
+                }
                
             }
-            else
+            catch (Exception e)
             {
-                try
-                {
-                    lines = File.ReadAllText("keys.json");
-                }catch(Exception e)
-                {
-                    output.Add(e.Message);
-
-                }
-                
+                output.Add(e.Message);
 
             }
-            keys = JsonConvert.DeserializeObject<KEY_JSON>(lines);
+            keys = JsonConvert.DeserializeObject<KEY_JSON>(lines); //deserialize keys if available
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e) //tick for timer, every millisecond runs when timer is active
         {
             pingDestination();
         }
 
-        private void AddressInput_KeyPressed(object sender, KeyPressEventArgs e)
+        private void AddressInput_KeyPressed(object sender, KeyPressEventArgs e) //If user is typing, only reupdate output list when enter is pressed
         {
             if (e.KeyChar == (char)Keys.Enter || e.KeyChar == (char)Keys.Return)
             {
@@ -67,14 +70,14 @@ namespace DNSGUI
                 DNSSearch();
             }
         }
-        void DNSSearch()
+        void DNSSearch() //DNS Search
         {
             try
             {
                 IPAddress[] ipAddresses = Dns.GetHostAddresses(AddressInput.Text);
                 foreach (IPAddress i in ipAddresses)
                 {
-                    output.Add(i);
+                    output.Add(i); //add to output list
                 }
             }catch(Exception e)
             {
@@ -85,11 +88,11 @@ namespace DNSGUI
         {
             try
             {
-                if (!currentlypinging)
+                if (!currentlypinging) //if not currently pinging
                 {
                     currentlypinging = true;
-                    reply = pingObject.Send(selectedIP);
-                    switch (reply.Status)
+                    reply = pingObject.Send(selectedIP); //get reply
+                    switch (reply.Status) 
                     {
                         case IPStatus.Success:
                             PingLabel.Text = reply.RoundtripTime + "ms to " + selectedIP;
@@ -103,11 +106,7 @@ namespace DNSGUI
                             timer.Enabled = false;
                             break;
                     }
-                    if (reply.Status == IPStatus.Success)
-                    {
-                        
-                    }
-                    else
+                    if (reply.Status != IPStatus.Success)
                     {
                         PingLabel.Text = reply.Status.ToString();
                     }
@@ -116,21 +115,21 @@ namespace DNSGUI
             }
             catch(Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e); //write to console since if it were to add to output, it would fill the output list
             }
             
             
         }
-        void updateInfoforIP()
+        void updateInfoforIP() //get info from IP-API.com
         {
             try
             {
-                String link = "http://ip-api.com/json/" + selectedIP.ToString();
-                String response = client.DownloadString(link);
+                String link = "http://ip-api.com/json/" + selectedIP.ToString(); //construct get request
+                String response = client.DownloadString(link); //download JSON string
                 Console.WriteLine(response);
-                IP_API_JSON jsonResponse=JsonConvert.DeserializeObject<IP_API_JSON>(response);
-                InformationLabel.Text = jsonResponse.ToString();
-                updateImage(jsonResponse);
+                IP_API_JSON jsonResponse=JsonConvert.DeserializeObject<IP_API_JSON>(response); //deserialize the JSON
+                InformationLabel.Text = jsonResponse.ToString(); //use toString for formatting
+                updateImage(jsonResponse); //update the image 
             }
             catch(Exception e)
             {
@@ -138,14 +137,15 @@ namespace DNSGUI
             }
             
         }
-        void updateImage(IP_API_JSON json)
+        void updateImage(IP_API_JSON json) //when new IP is selected get new image for the location
         {
+            //try to get image source, if not, build an image for the error
             System.Drawing.Image imagetest = tryImageSource(json.lon, json.lat, resultImage.Width, resultImage.Height);
             if (imagetest == null) {
                 imagetest = new System.Drawing.Bitmap(resultImage.Width, resultImage.Height);
                 System.Drawing.Font font = new System.Drawing.Font("TimesNewRoman", 25, FontStyle.Bold, GraphicsUnit.Pixel);
                 System.Drawing.Graphics graphics = Graphics.FromImage(imagetest);
-                graphics.DrawString("UNABLE TO GET IMAGE, MAYBE MISSING KEY", font, Brushes.Red, new Point(0, 0));
+                graphics.DrawString("UNABLE TO GET IMAGE,\nMAYBE MISSING KEY,\nOR UNAVAILABLE", font, Brushes.Red, new Point(0, 0));
             }
             resultImage.Image = imagetest;
         }
@@ -185,7 +185,7 @@ namespace DNSGUI
                             }
                             break;
                     }
-                    if (url!=null)
+                    if (url!=null) //we really don't need to check if the image was successful, the caller as error handling and makes a graphics image if null is returned
                     {
                         Console.WriteLine(url);
                         return Image.FromStream(client.OpenRead(url));
@@ -207,9 +207,10 @@ namespace DNSGUI
 
 
         }
+        //called when the the user selects an item in the IP Address list
         private void IPAddressOutput_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            //this is an IP, update info
             if (IPAddressOutput.SelectedItem is System.Net.IPAddress)
             {
                 selectedIP = (IPAddress)IPAddressOutput.SelectedItem;
@@ -218,12 +219,14 @@ namespace DNSGUI
 
             }else if (IPAddressOutput.SelectedItem == null)
             {
+                //was a null, probably before program started
                 Console.WriteLine("A Non-existent object was selected");
                 timer.Enabled = false;
                 PingLabel.Text = "";
             }
             else
             {
+                //handle all other types
                 Console.WriteLine("Selected object is not IPAddress, was type: "+IPAddressOutput.SelectedItem.GetType());
                 timer.Enabled = false;
                 PingLabel.Text = "";
